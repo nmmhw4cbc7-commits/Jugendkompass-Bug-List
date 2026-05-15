@@ -3,352 +3,347 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jugendkompass Bug List</title>
+  <title>Shared List</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Satisfy&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+ 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
     :root {
-      --bg: #f7f7f5;
-      --surface: #ffffff;
-      --border: #e8e8e4;
-      --text: #1a1a1a;
-      --muted: #9b9b94;
-      --accent: #1a1a1a;
-      --danger: #e5534b;
-      --radius: 10px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+      --bg:      #0e0e0e;
+      --surface: #161616;
+      --border:  rgba(255,255,255,0.08);
+      --text:    #e8e4dc;
+      --muted:   rgba(232,228,220,0.38);
+      --accent:  #c9a96e;
+      --danger:  #c0574f;
+      --radius:  12px;
+      --grid:    64px;
     }
-
+ 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      background-size: var(--grid) var(--grid);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 48px 16px 80px;
+      padding: 64px 16px 100px;
     }
-
+ 
     header {
       width: 100%;
-      max-width: 520px;
-      margin-bottom: 32px;
+      max-width: 540px;
+      margin-bottom: 36px;
+      text-align: center;
     }
-
+ 
     header h1 {
-      font-size: 22px;
-      font-weight: 500;
-      letter-spacing: -0.3px;
+      font-family: 'Satisfy', cursive;
+      font-size: 52px;
+      font-weight: 400;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+      text-shadow: 0 2px 32px rgba(201,169,110,0.3);
     }
-
+ 
     header p {
-      font-size: 13px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 17px;
       color: var(--muted);
-      margin-top: 4px;
+      margin-top: 10px;
     }
-
-    .dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
+ 
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(201,169,110,0.07);
+      border: 1px solid rgba(201,169,110,0.18);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 10.5px;
+      color: var(--accent);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+ 
+    .live-dot {
+      width: 6px; height: 6px;
       background: #4caf7d;
       border-radius: 50%;
-      margin-right: 6px;
       animation: pulse 2s ease-in-out infinite;
     }
-
+ 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(76,175,125,0.5); }
+      50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(76,175,125,0); }
     }
-
+ 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 8px 48px rgba(0,0,0,0.6);
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       overflow: hidden;
     }
-
+ 
     .input-row {
       display: flex;
-      gap: 0;
       border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
     }
-
+ 
     #item-input {
       flex: 1;
       border: none;
       outline: none;
-      padding: 16px 18px;
+      padding: 18px 20px;
       font-family: 'DM Sans', sans-serif;
       font-size: 15px;
       color: var(--text);
       background: transparent;
+      caret-color: var(--accent);
     }
-
+ 
     #item-input::placeholder { color: var(--muted); }
-
+ 
     #add-btn {
       border: none;
       outline: none;
       background: transparent;
-      padding: 16px 20px;
+      padding: 18px 22px;
       cursor: pointer;
       color: var(--muted);
       display: flex;
       align-items: center;
       transition: color 0.15s, background 0.15s;
     }
-
-    #add-btn:hover { background: var(--bg); color: var(--text); }
-    #add-btn svg { width: 18px; height: 18px; }
-
-    #list {
-      list-style: none;
-      min-height: 60px;
-    }
-
+ 
+    #add-btn:hover { color: var(--accent); background: rgba(201,169,110,0.07); }
+    #add-btn svg { width: 20px; height: 20px; }
+ 
+    #list { list-style: none; min-height: 72px; }
+ 
     .item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
+      gap: 14px;
+      padding: 15px 20px;
       border-bottom: 1px solid var(--border);
-      animation: slideIn 0.2s ease forwards;
-      gap: 12px;
+      animation: slideIn 0.22s cubic-bezier(0.22,1,0.36,1) forwards;
+      transition: background 0.12s;
     }
-
+ 
     .item:last-child { border-bottom: none; }
-
+    .item:hover { background: rgba(255,255,255,0.02); }
+ 
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-6px); }
+      from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .item.removing {
-      animation: fadeOut 0.2s ease forwards;
-    }
-
+ 
+    .item.removing { animation: fadeOut 0.18s ease forwards; }
+ 
     @keyframes fadeOut {
-      to { opacity: 0; transform: translateX(8px); }
+      to { opacity: 0; transform: translateX(10px); }
     }
-
+ 
+    .item-bullet {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.45;
+      flex-shrink: 0;
+    }
+ 
     .item-text {
-      font-size: 14.5px;
-      line-height: 1.5;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px;
+      line-height: 1.4;
       flex: 1;
       word-break: break-word;
     }
-
+ 
     .item-time {
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
       white-space: nowrap;
       flex-shrink: 0;
     }
-
+ 
     .delete-btn {
       border: none;
       background: none;
       cursor: pointer;
       color: transparent;
-      padding: 4px;
-      border-radius: 5px;
+      padding: 5px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       transition: color 0.15s, background 0.15s;
       flex-shrink: 0;
     }
-
+ 
     .item:hover .delete-btn { color: var(--muted); }
-    .delete-btn:hover { color: var(--danger) !important; background: #fdf1f0; }
-    .delete-btn svg { width: 14px; height: 14px; }
-
+    .delete-btn:hover { color: var(--danger) !important; background: rgba(192,87,79,0.1); }
+    .delete-btn svg { width: 13px; height: 13px; }
+ 
     #empty {
-      padding: 40px 18px;
+      padding: 52px 20px;
       text-align: center;
       color: var(--muted);
-      font-size: 14px;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
     }
-
+ 
     #status {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--muted);
-      margin-top: 16px;
+      margin-top: 14px;
       width: 100%;
-      max-width: 520px;
-      text-align: right;
+      max-width: 540px;
+      text-align: center;
       min-height: 18px;
-      transition: opacity 0.3s;
+      letter-spacing: 0.3px;
     }
-
-
   </style>
 </head>
 <body>
-
-  <!-- ── MAIN APP ── -->
+ 
   <header>
-    <h1><span class="dot"></span>Shared List</h1>
-    <p>Everything you add is visible to everyone in real time.</p>
+    <div class="live-badge"><span class="live-dot"></span> Live</div>
+    <h1>Shared List</h1>
+    <p>Everything you add appears for everyone, instantly.</p>
   </header>
-
+ 
   <div class="card">
     <div class="input-row">
-      <input id="item-input" type="text" placeholder="Add something…" maxlength="280" autocomplete="off" />
+      <input id="item-input" type="text" placeholder="Add something to the list…" maxlength="280" autocomplete="off" />
       <button id="add-btn" title="Add item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
       </button>
     </div>
     <ul id="list">
-      <li id="empty">No items yet. Add the first one ↑</li>
+      <li id="empty">Nothing here yet — be the first to add something.</li>
     </ul>
   </div>
-
+ 
   <div id="status"></div>
-
+ 
 <script>
-  /* ── 🔧 FILL IN YOUR SUPABASE CREDENTIALS HERE ── */
-  const SUPABASE_URL = 'https://nremajubzoyjtavhucpc.supabase.co/rest/v1/';
+  /* ── 🔧 YOUR SUPABASE CREDENTIALS ── */
+  const SUPABASE_URL      = 'https://nremajubzoyjtavhucpc.supabase.co/rest/v1/';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yZW1hanViem95anRhdmh1Y3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDk3MTYsImV4cCI6MjA5NDM4NTcxNn0.o_3d6WmibSxGH898Hd7L8xMgJv9aMGCk_vimnwl9-hk';
-  /* ─────────────────────────────────────────────── */
-
-  const $ = id => document.getElementById(id);
+  /* ─────────────────────────────────── */
+ 
+  const $   = id => document.getElementById(id);
   const fmt = ts => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  /* ── main init ── */
-  async function init() {
+ 
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let channel;
+ 
+  document.addEventListener('DOMContentLoaded', async () => {
     await loadItems();
     subscribeRealtime();
-
     $('add-btn').addEventListener('click', addItem);
-    $('item-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addItem();
-    });
-  }
-
-  /* ── load all items ── */
+    $('item-input').addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
+  });
+ 
   async function loadItems() {
-    const { data, error } = await supabase
-      .from('items')
-      .select('*')
-      .order('created_at', { ascending: true });
-
-    if (error) return setStatus('Failed to load items.');
+    const { data, error } = await client.from('items').select('*').order('created_at', { ascending: true });
+    if (error) return setStatus('Could not load items: ' + error.message);
     renderAll(data || []);
   }
-
-  /* ── render helpers ── */
+ 
   function renderAll(items) {
     const list = $('list');
     list.innerHTML = '';
     if (!items.length) {
-      list.innerHTML = '<li id="empty">No items yet. Add the first one ↑</li>';
+      list.innerHTML = '<li id="empty">Nothing here yet — be the first to add something.</li>';
       return;
     }
     items.forEach(item => list.appendChild(makeRow(item)));
   }
-
+ 
   function makeRow(item) {
     const li = document.createElement('li');
     li.className = 'item';
     li.dataset.id = item.id;
     li.innerHTML = `
-      <span class="item-text">${escHtml(item.text)}</span>
+      <span class="item-bullet"></span>
+      <span class="item-text">${esc(item.text)}</span>
       <span class="item-time">${fmt(item.created_at)}</span>
-      <button class="delete-btn" title="Delete">
+      <button class="delete-btn" title="Remove">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
-      </button>
-    `;
+      </button>`;
     li.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id, li));
     return li;
   }
-
-  function escHtml(str) {
+ 
+  function esc(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-
-  /* ── add item ── */
+ 
   async function addItem() {
     const input = $('item-input');
     const text  = input.value.trim();
     if (!text) return;
     input.value = '';
     setStatus('Saving…');
-
-    const { error } = await supabase.from('items').insert({ text });
-    if (error) {
-      setStatus('Error: ' + error.message);
-      input.value = text;
-    } else {
-      setStatus('');
-    }
+    const { error } = await client.from('items').insert({ text });
+    if (error) { setStatus('Error: ' + error.message); input.value = text; }
+    else setStatus('');
   }
-
-  /* ── delete item ── */
+ 
   async function deleteItem(id, li) {
     li.classList.add('removing');
-    await new Promise(r => setTimeout(r, 200));
-    const { error } = await supabase.from('items').delete().eq('id', id);
-    if (error) {
-      li.classList.remove('removing');
-      setStatus('Delete failed: ' + error.message);
-    }
+    await new Promise(r => setTimeout(r, 180));
+    const { error } = await client.from('items').delete().eq('id', id);
+    if (error) { li.classList.remove('removing'); setStatus('Delete failed: ' + error.message); }
   }
-
-  /* ── realtime subscription ── */
+ 
   function subscribeRealtime() {
-    channel = supabase
+    channel = client
       .channel('items-changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' }, ({ new: item }) => {
-        removeEmpty();
+        const e = $('empty'); if (e) e.remove();
         $('list').appendChild(makeRow(item));
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'items' }, ({ old: item }) => {
         const el = document.querySelector(`[data-id="${item.id}"]`);
         if (el) el.remove();
-        if (!$('list').children.length) {
-          $('list').innerHTML = '<li id="empty">No items yet. Add the first one ↑</li>';
-        }
+        if (!$('list').children.length)
+          $('list').innerHTML = '<li id="empty">Nothing here yet — be the first to add something.</li>';
       })
-      .subscribe(status => {
-        if (status === 'SUBSCRIBED') setStatus('', 0);
-      });
+      .subscribe();
   }
-
-  function removeEmpty() {
-    const e = $('empty');
-    if (e) e.remove();
+ 
+  let _t;
+  function setStatus(msg, ms = 2500) {
+    $('status').textContent = msg;
+    clearTimeout(_t);
+    if (msg && ms) _t = setTimeout(() => $('status').textContent = '', ms);
   }
-
-  /* ── status flash ── */
-  let _stTimer;
-  function setStatus(msg, duration = 2500) {
-    const el = $('status');
-    el.textContent = msg;
-    clearTimeout(_stTimer);
-    if (msg && duration) {
-      _stTimer = setTimeout(() => el.textContent = '', duration);
-    }
-  }
-
-  init();
 </script>
 </body>
 </html>
