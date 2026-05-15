@@ -3,120 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shared List</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Satisfy&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet" />
+  <title>Jugendkompass Bug Liste</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  
     :root {
-      --bg:      #0e0e0e;
-      --surface: #161616;
-      --border:  rgba(255,255,255,0.08);
-      --text:    #e8e4dc;
-      --muted:   rgba(232,228,220,0.38);
-      --accent:  #c9a96e;
-      --danger:  #c0574f;
-      --radius:  12px;
-      --grid:    64px;
+      --bg:       #070d16;
+      --surface:  #0c1524;
+      --surface2: #101d30;
+      --border:   #1a2e4a;
+      --text:     #c8d8ea;
+      --muted:    #4a6480;
+      --accent:   #3b82f6;
+      --accent2:  #60a5fa;
+      --danger:   #ef4444;
+      --green:    #22c55e;
+      --radius:   6px;
     }
  
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'JetBrains Mono', monospace;
       background-color: var(--bg);
       background-image:
-        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-      background-size: var(--grid) var(--grid);
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
       color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 64px 16px 100px;
+      padding: 56px 16px 100px;
     }
  
+    /* ── header ── */
     header {
       width: 100%;
-      max-width: 540px;
-      margin-bottom: 36px;
+      max-width: 600px;
+      margin-bottom: 32px;
+    }
+ 
+    .term-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 10px 16px;
+    }
+ 
+    .term-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .term-dot.r { background: #ef4444; }
+    .term-dot.y { background: #374151; }
+    .term-dot.g { background: #22c55e; }
+ 
+    .term-title {
+      flex: 1;
       text-align: center;
-    }
- 
-    header h1 {
-      font-family: 'Satisfy', cursive;
-      font-size: 52px;
-      font-weight: 400;
-      color: var(--accent);
-      letter-spacing: 0.5px;
-      line-height: 1.1;
-      text-shadow: 0 2px 32px rgba(201,169,110,0.3);
-    }
- 
-    header p {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 17px;
+      font-size: 11px;
       color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+ 
+    .header-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 24px 20px;
+    }
+ 
+    .prompt-line {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+ 
+    .prompt-line span { color: var(--accent); }
+ 
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent2);
+      letter-spacing: -0.5px;
+    }
+ 
+    h1 .prefix { color: var(--muted); font-weight: 300; }
+ 
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
       margin-top: 10px;
     }
  
-    .live-badge {
+    .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(201,169,110,0.07);
-      border: 1px solid rgba(201,169,110,0.18);
-      border-radius: 99px;
-      padding: 4px 12px;
-      font-size: 10.5px;
-      color: var(--accent);
-      letter-spacing: 1.2px;
+      gap: 5px;
+      font-size: 10px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      margin-bottom: 18px;
+      color: var(--muted);
     }
  
-    .live-dot {
+    .badge.live .dot {
       width: 6px; height: 6px;
-      background: #4caf7d;
       border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
+      background: var(--green);
+      animation: blink 1.5s ease-in-out infinite;
     }
  
-    @keyframes pulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(76,175,125,0.5); }
-      50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(76,175,125,0); }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
     }
  
+    /* ── card ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 8px 48px rgba(0,0,0,0.6);
       width: 100%;
-      max-width: 540px;
+      max-width: 600px;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
       overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.05);
     }
  
+    /* ── input ── */
     .input-row {
       display: flex;
+      background: var(--surface2);
       border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
+    }
+ 
+    .input-prefix {
+      display: flex;
+      align-items: center;
+      padding: 0 0 0 16px;
+      font-size: 13px;
+      color: var(--accent);
+      user-select: none;
+      flex-shrink: 0;
     }
  
     #item-input {
       flex: 1;
       border: none;
       outline: none;
-      padding: 18px 20px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
+      padding: 16px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
       color: var(--text);
       background: transparent;
-      caret-color: var(--accent);
+      caret-color: var(--accent2);
     }
  
     #item-input::placeholder { color: var(--muted); }
@@ -125,65 +172,68 @@
       border: none;
       outline: none;
       background: transparent;
-      padding: 18px 22px;
+      padding: 0 18px;
       cursor: pointer;
       color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
       display: flex;
       align-items: center;
-      transition: color 0.15s, background 0.15s;
+      transition: color 0.12s, background 0.12s;
+      border-left: 1px solid var(--border);
     }
  
-    #add-btn:hover { color: var(--accent); background: rgba(201,169,110,0.07); }
-    #add-btn svg { width: 20px; height: 20px; }
+    #add-btn:hover { color: var(--accent2); background: rgba(59,130,246,0.08); }
  
-    #list { list-style: none; min-height: 72px; }
+    /* ── list ── */
+    #list { list-style: none; background: var(--surface); }
  
     .item {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 15px 20px;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 16px;
       border-bottom: 1px solid var(--border);
-      animation: slideIn 0.22s cubic-bezier(0.22,1,0.36,1) forwards;
-      transition: background 0.12s;
+      animation: slideIn 0.18s ease forwards;
+      transition: background 0.1s;
     }
  
     .item:last-child { border-bottom: none; }
-    .item:hover { background: rgba(255,255,255,0.02); }
+    .item:hover { background: var(--surface2); }
  
     @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateX(-6px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
  
-    .item.removing { animation: fadeOut 0.18s ease forwards; }
+    .item.removing { animation: fadeOut 0.15s ease forwards; }
  
     @keyframes fadeOut {
-      to { opacity: 0; transform: translateX(10px); }
+      to { opacity: 0; transform: translateX(8px); }
     }
  
-    .item-bullet {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      opacity: 0.45;
+    .item-index {
+      font-size: 11px;
+      color: var(--muted);
       flex-shrink: 0;
+      padding-top: 2px;
+      min-width: 28px;
     }
  
     .item-text {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 19px;
-      line-height: 1.4;
+      font-size: 13px;
+      line-height: 1.55;
       flex: 1;
       word-break: break-word;
+      color: var(--text);
     }
  
     .item-time {
-      font-family: 'DM Mono', monospace;
       font-size: 10px;
       color: var(--muted);
       white-space: nowrap;
       flex-shrink: 0;
+      padding-top: 3px;
     }
  
     .delete-btn {
@@ -191,35 +241,37 @@
       background: none;
       cursor: pointer;
       color: transparent;
-      padding: 5px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      transition: color 0.15s, background 0.15s;
+      font-size: 14px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: color 0.12s, background 0.12s;
       flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
     }
  
     .item:hover .delete-btn { color: var(--muted); }
-    .delete-btn:hover { color: var(--danger) !important; background: rgba(192,87,79,0.1); }
-    .delete-btn svg { width: 13px; height: 13px; }
+    .delete-btn:hover { color: var(--danger) !important; background: rgba(239,68,68,0.1); }
  
     #empty {
-      padding: 52px 20px;
+      padding: 48px 16px;
       text-align: center;
       color: var(--muted);
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 18px;
+      font-size: 12px;
+      letter-spacing: 0.3px;
     }
  
+    #empty span { color: var(--accent); }
+ 
     #status {
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--muted);
-      margin-top: 14px;
+      margin-top: 12px;
       width: 100%;
-      max-width: 540px;
-      text-align: center;
-      min-height: 18px;
+      max-width: 600px;
+      text-align: left;
+      min-height: 16px;
+      padding-left: 2px;
       letter-spacing: 0.3px;
     }
   </style>
@@ -227,32 +279,40 @@
 <body>
  
   <header>
-    <div class="live-badge"><span class="live-dot"></span> Live</div>
-    <h1>Shared List</h1>
-    <p>Everything you add appears for everyone, instantly.</p>
+    <div class="term-bar">
+      <span class="term-dot r"></span>
+      <span class="term-dot y"></span>
+      <span class="term-dot g"></span>
+      <span class="term-title">jugendkompass — bug-liste.html</span>
+    </div>
+    <div class="header-box">
+      <div class="prompt-line"><span>~/jugendkompass</span> $ open bug-liste</div>
+      <h1><span class="prefix">// </span>Jugendkompass Bug Liste</h1>
+      <div class="meta-row">
+        <span class="badge live"><span class="dot"></span> live sync</span>
+        <span class="badge">shared · realtime</span>
+      </div>
+    </div>
   </header>
  
   <div class="card">
     <div class="input-row">
-      <input id="item-input" type="text" placeholder="Add something to the list…" maxlength="280" autocomplete="off" />
-      <button id="add-btn" title="Add item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-      </button>
+      <span class="input-prefix">&gt;_</span>
+      <input id="item-input" type="text" placeholder="neuen bug eintragen…" maxlength="280" autocomplete="off" />
+      <button id="add-btn" title="Hinzufügen">+</button>
     </div>
     <ul id="list">
-      <li id="empty">Nothing here yet — be the first to add something.</li>
+      <li id="empty">// keine einträge — <span>ersten bug melden ↑</span></li>
     </ul>
   </div>
  
   <div id="status"></div>
  
 <script>
-  /* ── 🔧 YOUR SUPABASE CREDENTIALS ── */
+  /* ── 🔧 SUPABASE CREDENTIALS ── */
   const SUPABASE_URL      = 'https://nremajubzoyjtavhucpc.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yZW1hanViem95anRhdmh1Y3BjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDk3MTYsImV4cCI6MjA5NDM4NTcxNn0.o_3d6WmibSxGH898Hd7L8xMgJv9aMGCk_vimnwl9-hk';
-  /* ─────────────────────────────────── */
+  /* ───────────────────────────── */
  
   const $   = id => document.getElementById(id);
   const fmt = ts => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -269,7 +329,7 @@
  
   async function loadItems() {
     const { data, error } = await client.from('items').select('*').order('created_at', { ascending: true });
-    if (error) return setStatus('Could not load items: ' + error.message);
+    if (error) return setStatus('[error] ' + error.message);
     renderAll(data || []);
   }
  
@@ -277,25 +337,22 @@
     const list = $('list');
     list.innerHTML = '';
     if (!items.length) {
-      list.innerHTML = '<li id="empty">Nothing here yet — be the first to add something.</li>';
+      list.innerHTML = '<li id="empty">// keine einträge — <span>ersten bug melden ↑</span></li>';
       return;
     }
-    items.forEach(item => list.appendChild(makeRow(item)));
+    items.forEach((item, i) => list.appendChild(makeRow(item, i + 1)));
   }
  
-  function makeRow(item) {
+  function makeRow(item, index) {
     const li = document.createElement('li');
     li.className = 'item';
     li.dataset.id = item.id;
+    const idx = index ?? $('list').children.length + 1;
     li.innerHTML = `
-      <span class="item-bullet"></span>
+      <span class="item-index">#${String(idx).padStart(2,'0')}</span>
       <span class="item-text">${esc(item.text)}</span>
       <span class="item-time">${fmt(item.created_at)}</span>
-      <button class="delete-btn" title="Remove">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>`;
+      <button class="delete-btn" title="Löschen">✕</button>`;
     li.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id, li));
     return li;
   }
@@ -309,17 +366,17 @@
     const text  = input.value.trim();
     if (!text) return;
     input.value = '';
-    setStatus('Saving…');
+    setStatus('// saving…');
     const { error } = await client.from('items').insert({ text });
-    if (error) { setStatus('Error: ' + error.message); input.value = text; }
+    if (error) { setStatus('[error] ' + error.message); input.value = text; }
     else setStatus('');
   }
  
   async function deleteItem(id, li) {
     li.classList.add('removing');
-    await new Promise(r => setTimeout(r, 180));
+    await new Promise(r => setTimeout(r, 150));
     const { error } = await client.from('items').delete().eq('id', id);
-    if (error) { li.classList.remove('removing'); setStatus('Delete failed: ' + error.message); }
+    if (error) { li.classList.remove('removing'); setStatus('[error] ' + error.message); }
   }
  
   function subscribeRealtime() {
@@ -327,13 +384,16 @@
       .channel('items-changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' }, ({ new: item }) => {
         const e = $('empty'); if (e) e.remove();
-        $('list').appendChild(makeRow(item));
+        const idx = $('list').children.length + 1;
+        $('list').appendChild(makeRow(item, idx));
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'items' }, ({ old: item }) => {
         const el = document.querySelector(`[data-id="${item.id}"]`);
         if (el) el.remove();
         if (!$('list').children.length)
-          $('list').innerHTML = '<li id="empty">Nothing here yet — be the first to add something.</li>';
+          $('list').innerHTML = '<li id="empty">// keine einträge — <span>ersten bug melden ↑</span></li>';
+        // re-number
+        document.querySelectorAll('.item-index').forEach((el, i) => el.textContent = '#' + String(i+1).padStart(2,'0'));
       })
       .subscribe();
   }
