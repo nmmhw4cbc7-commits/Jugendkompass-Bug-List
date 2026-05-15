@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shared List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f7f5;
+      --surface: #ffffff;
+      --border: #e8e8e4;
+      --text: #1a1a1a;
+      --muted: #9b9b94;
+      --accent: #1a1a1a;
+      --danger: #e5534b;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px 80px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 520px;
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+    }
+
+    header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #4caf7d;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #item-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 16px 18px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: transparent;
+    }
+
+    #item-input::placeholder { color: var(--muted); }
+
+    #add-btn {
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 16px 20px;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    #add-btn:hover { background: var(--bg); color: var(--text); }
+    #add-btn svg { width: 18px; height: 18px; }
+
+    #list {
+      list-style: none;
+      min-height: 60px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      animation: slideIn 0.2s ease forwards;
+      gap: 12px;
+    }
+
+    .item:last-child { border-bottom: none; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .item.removing {
+      animation: fadeOut 0.2s ease forwards;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(8px); }
+    }
+
+    .item-text {
+      font-size: 14.5px;
+      line-height: 1.5;
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .item-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .delete-btn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: transparent;
+      padding: 4px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .item:hover .delete-btn { color: var(--muted); }
+    .delete-btn:hover { color: var(--danger) !important; background: #fdf1f0; }
+    .delete-btn svg { width: 14px; height: 14px; }
+
+    #empty {
+      padding: 40px 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    #status {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 16px;
+      width: 100%;
+      max-width: 520px;
+      text-align: right;
+      min-height: 18px;
+      transition: opacity 0.3s;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- ── MAIN APP ── -->
+  <header>
+    <h1><span class="dot"></span>Shared List</h1>
+    <p>Everything you add is visible to everyone in real time.</p>
+  </header>
+
+  <div class="card">
+    <div class="input-row">
+      <input id="item-input" type="text" placeholder="Add something…" maxlength="280" autocomplete="off" />
+      <button id="add-btn" title="Add item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+    <ul id="list">
+      <li id="empty">No items yet. Add the first one ↑</li>
+    </ul>
+  </div>
+
+  <div id="status"></div>
+
+<script>
+  /* ── 🔧 FILL IN YOUR SUPABASE CREDENTIALS HERE ── */
+  const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  /* ─────────────────────────────────────────────── */
+
+  const $ = id => document.getElementById(id);
+  const fmt = ts => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ── main init ── */
+  async function init() {
+    await loadItems();
+    subscribeRealtime();
+
+    $('add-btn').addEventListener('click', addItem);
+    $('item-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addItem();
+    });
+  }
+
+  /* ── load all items ── */
+  async function loadItems() {
+    const { data, error } = await supabase
+      .from('items')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) return setStatus('Failed to load items.');
+    renderAll(data || []);
+  }
+
+  /* ── render helpers ── */
+  function renderAll(items) {
+    const list = $('list');
+    list.innerHTML = '';
+    if (!items.length) {
+      list.innerHTML = '<li id="empty">No items yet. Add the first one ↑</li>';
+      return;
+    }
+    items.forEach(item => list.appendChild(makeRow(item)));
+  }
+
+  function makeRow(item) {
+    const li = document.createElement('li');
+    li.className = 'item';
+    li.dataset.id = item.id;
+    li.innerHTML = `
+      <span class="item-text">${escHtml(item.text)}</span>
+      <span class="item-time">${fmt(item.created_at)}</span>
+      <button class="delete-btn" title="Delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    `;
+    li.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id, li));
+    return li;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── add item ── */
+  async function addItem() {
+    const input = $('item-input');
+    const text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    setStatus('Saving…');
+
+    const { error } = await supabase.from('items').insert({ text });
+    if (error) {
+      setStatus('Error: ' + error.message);
+      input.value = text;
+    } else {
+      setStatus('');
+    }
+  }
+
+  /* ── delete item ── */
+  async function deleteItem(id, li) {
+    li.classList.add('removing');
+    await new Promise(r => setTimeout(r, 200));
+    const { error } = await supabase.from('items').delete().eq('id', id);
+    if (error) {
+      li.classList.remove('removing');
+      setStatus('Delete failed: ' + error.message);
+    }
+  }
+
+  /* ── realtime subscription ── */
+  function subscribeRealtime() {
+    channel = supabase
+      .channel('items-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' }, ({ new: item }) => {
+        removeEmpty();
+        $('list').appendChild(makeRow(item));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'items' }, ({ old: item }) => {
+        const el = document.querySelector(`[data-id="${item.id}"]`);
+        if (el) el.remove();
+        if (!$('list').children.length) {
+          $('list').innerHTML = '<li id="empty">No items yet. Add the first one ↑</li>';
+        }
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') setStatus('', 0);
+      });
+  }
+
+  function removeEmpty() {
+    const e = $('empty');
+    if (e) e.remove();
+  }
+
+  /* ── status flash ── */
+  let _stTimer;
+  function setStatus(msg, duration = 2500) {
+    const el = $('status');
+    el.textContent = msg;
+    clearTimeout(_stTimer);
+    if (msg && duration) {
+      _stTimer = setTimeout(() => el.textContent = '', duration);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
