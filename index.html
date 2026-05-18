@@ -1,4 +1,4 @@
-Shared list 
+Shared list
 
 <!DOCTYPE html>
 <html lang="en">
@@ -278,7 +278,10 @@ Shared list
 <body>
  
   <header>
-    <div class="live-badge"><span class="live-dot"></span> live sync</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <div class="live-badge" style="margin-bottom:0"><span class="live-dot"></span> live sync</div>
+      <div class="live-badge" id="online-badge" style="margin-bottom:0">● <span id="online-count">–</span>&nbsp;online</div>
+    </div>
     <h1><span class="prefix">// </span>Jugendkompass To Do Liste</h1>
     <p>geteilte Liste für To Do's und Bugs in der Jugendkompass App</p>
   </header>
@@ -368,6 +371,7 @@ Shared list
   }
  
   function subscribeRealtime() {
+    const myId = crypto.randomUUID();
     channel = client
       .channel('items-changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'items' }, ({ new: item }) => {
@@ -382,7 +386,16 @@ Shared list
           $('list').innerHTML = '<li id="empty">// keine einträge — <span>ersten eintrag hinzufügen ↑</span></li>';
         document.querySelectorAll('.item-index').forEach((el, i) => el.textContent = '#' + String(i+1).padStart(2,'0'));
       })
-      .subscribe();
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const count = Object.keys(state).length;
+        $('online-count').textContent = count;
+      })
+      .subscribe(async status => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ user: myId, online_at: new Date().toISOString() });
+        }
+      });
   }
  
   let _t;
