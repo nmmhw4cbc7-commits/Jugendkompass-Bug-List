@@ -1,3 +1,6 @@
+Shared list · HTML
+Kopieren
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,159 +14,150 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  
     :root {
-      --bg:       #070d16;
-      --surface:  #0c1524;
-      --surface2: #101d30;
-      --border:   #1a2e4a;
-      --text:     #c8d8ea;
-      --muted:    #4a6480;
-      --accent:   #3b82f6;
-      --accent2:  #60a5fa;
-      --danger:   #ef4444;
-      --green:    #22c55e;
-      --radius:   6px;
+      --accent:  #60a5fa;
+      --accent2: #93c5fd;
+      --danger:  #f87171;
+      --green:   #4ade80;
+      --text:    #e2eaf4;
+      --muted:   rgba(180,210,240,0.4);
+      --border:  rgba(96,165,250,0.15);
+      --glass:   rgba(10,25,60,0.55);
+      --glass2:  rgba(15,35,80,0.7);
+      --radius:  16px;
     }
  
     body {
       font-family: 'JetBrains Mono', monospace;
-      background-color: var(--bg);
-      background-image:
-        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 56px 16px 100px;
+      padding: 64px 16px 100px;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(29,78,216,0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(37,99,235,0.25) 0%, transparent 55%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, #030a1a 0%, #060f24 100%);
+      background-attachment: fixed;
+      color: var(--text);
+    }
+ 
+    /* subtle grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(96,165,250,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(96,165,250,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+ 
+    header, .card, #status {
+      position: relative;
+      z-index: 1;
     }
  
     /* ── header ── */
     header {
       width: 100%;
       max-width: 600px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
+      padding: 0 4px;
     }
  
-    .term-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-bottom: none;
-      border-radius: var(--radius) var(--radius) 0 0;
-      padding: 10px 16px;
-    }
- 
-    .term-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-    }
-    .term-dot.r { background: #ef4444; }
-    .term-dot.y { background: #374151; }
-    .term-dot.g { background: #22c55e; }
- 
-    .term-title {
-      flex: 1;
-      text-align: center;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-    }
- 
-    .header-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 24px 24px 20px;
-    }
- 
-    .prompt-line {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      letter-spacing: 0.3px;
-    }
- 
-    .prompt-line span { color: var(--accent); }
- 
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--accent2);
-      letter-spacing: -0.5px;
-    }
- 
-    h1 .prefix { color: var(--muted); font-weight: 300; }
- 
-    .meta-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-top: 10px;
-    }
- 
-    .badge {
+    .live-badge {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 7px;
+      background: rgba(96,165,250,0.1);
+      border: 1px solid rgba(96,165,250,0.2);
+      border-radius: 99px;
+      padding: 5px 14px;
       font-size: 10px;
-      letter-spacing: 0.8px;
+      color: var(--accent);
+      letter-spacing: 1.2px;
       text-transform: uppercase;
-      color: var(--muted);
+      margin-bottom: 16px;
     }
  
-    .badge.live .dot {
+    .live-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--green);
-      animation: blink 1.5s ease-in-out infinite;
+      animation: blink 1.8s ease-in-out infinite;
     }
  
     @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+      50%       { opacity: 0.3; box-shadow: none; }
     }
  
-    /* ── card ── */
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+ 
+    h1 .prefix {
+      color: var(--accent);
+      font-weight: 300;
+    }
+ 
+    header p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.3px;
+    }
+ 
+    /* ── glass card ── */
     .card {
       width: 100%;
       max-width: 600px;
+      background: var(--glass);
       border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 var(--radius) var(--radius);
+      border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(59,130,246,0.05);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      box-shadow:
+        0 0 0 1px rgba(96,165,250,0.06),
+        0 8px 32px rgba(0,0,0,0.5),
+        0 32px 80px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.06);
     }
  
-    /* ── input ── */
+    /* ── input row ── */
     .input-row {
       display: flex;
-      background: var(--surface2);
+      align-items: center;
       border-bottom: 1px solid var(--border);
+      background: var(--glass2);
     }
  
     .input-prefix {
-      display: flex;
-      align-items: center;
-      padding: 0 0 0 16px;
-      font-size: 13px;
+      padding: 0 4px 0 18px;
+      font-size: 14px;
       color: var(--accent);
       user-select: none;
       flex-shrink: 0;
+      opacity: 0.7;
     }
  
     #item-input {
       flex: 1;
       border: none;
       outline: none;
-      padding: 16px 12px;
+      padding: 18px 14px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
       color: var(--text);
       background: transparent;
-      caret-color: var(--accent2);
+      caret-color: var(--accent);
     }
  
     #item-input::placeholder { color: var(--muted); }
@@ -172,48 +166,54 @@
       border: none;
       outline: none;
       background: transparent;
-      padding: 0 18px;
+      padding: 0 20px;
+      height: 100%;
       cursor: pointer;
       color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 18px;
+      font-size: 22px;
       display: flex;
       align-items: center;
-      transition: color 0.12s, background 0.12s;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
       border-left: 1px solid var(--border);
+      min-height: 54px;
     }
  
-    #add-btn:hover { color: var(--accent2); background: rgba(59,130,246,0.08); }
+    #add-btn:hover {
+      color: var(--accent);
+      background: rgba(96,165,250,0.08);
+    }
  
     /* ── list ── */
-    #list { list-style: none; background: var(--surface); }
+    #list { list-style: none; }
  
     .item {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      padding: 13px 16px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--border);
-      animation: slideIn 0.18s ease forwards;
-      transition: background 0.1s;
+      animation: slideIn 0.2s cubic-bezier(0.22,1,0.36,1) forwards;
+      transition: background 0.12s;
     }
  
     .item:last-child { border-bottom: none; }
-    .item:hover { background: var(--surface2); }
+ 
+    .item:hover { background: rgba(96,165,250,0.05); }
  
     @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-6px); }
-      to   { opacity: 1; transform: translateX(0); }
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
  
     .item.removing { animation: fadeOut 0.15s ease forwards; }
  
     @keyframes fadeOut {
-      to { opacity: 0; transform: translateX(8px); }
+      to { opacity: 0; transform: translateX(10px); }
     }
  
     .item-index {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
       flex-shrink: 0;
       padding-top: 2px;
@@ -222,7 +222,7 @@
  
     .item-text {
       font-size: 13px;
-      line-height: 1.55;
+      line-height: 1.6;
       flex: 1;
       word-break: break-word;
       color: var(--text);
@@ -233,7 +233,7 @@
       color: var(--muted);
       white-space: nowrap;
       flex-shrink: 0;
-      padding-top: 3px;
+      padding-top: 2px;
     }
  
     .delete-btn {
@@ -241,20 +241,19 @@
       background: none;
       cursor: pointer;
       color: transparent;
-      font-size: 14px;
-      padding: 2px 4px;
-      border-radius: 3px;
+      font-size: 13px;
+      padding: 2px 5px;
+      border-radius: 4px;
       transition: color 0.12s, background 0.12s;
       flex-shrink: 0;
       font-family: 'JetBrains Mono', monospace;
-      line-height: 1;
     }
  
     .item:hover .delete-btn { color: var(--muted); }
-    .delete-btn:hover { color: var(--danger) !important; background: rgba(239,68,68,0.1); }
+    .delete-btn:hover { color: var(--danger) !important; background: rgba(248,113,113,0.1); }
  
     #empty {
-      padding: 48px 16px;
+      padding: 52px 18px;
       text-align: center;
       color: var(--muted);
       font-size: 12px;
@@ -263,15 +262,16 @@
  
     #empty span { color: var(--accent); }
  
+    /* ── status ── */
     #status {
       font-size: 11px;
       color: var(--muted);
-      margin-top: 12px;
+      margin-top: 14px;
       width: 100%;
       max-width: 600px;
       text-align: left;
       min-height: 16px;
-      padding-left: 2px;
+      padding-left: 4px;
       letter-spacing: 0.3px;
     }
   </style>
@@ -279,30 +279,19 @@
 <body>
  
   <header>
-    <div class="term-bar">
-      <span class="term-dot r"></span>
-      <span class="term-dot y"></span>
-      <span class="term-dot g"></span>
-      <span class="term-title">jugendkompass — bug-liste.html</span>
-    </div>
-    <div class="header-box">
-      <div class="prompt-line"><span>~/jugendkompass</span> $ open bug-liste</div>
-      <h1><span class="prefix">// </span>Jugendkompass To Do Liste</h1>
-      <div class="meta-row">
-        <span class="badge live"><span class="dot"></span> live sync</span>
-        <span class="badge">shared · realtime</span>
-      </div>
-    </div>
+    <div class="live-badge"><span class="live-dot"></span> live sync</div>
+    <h1><span class="prefix">// </span>Jugendkompass To Do Liste</h1>
+    <p>shared · realtime · alle sehen änderungen sofort</p>
   </header>
  
   <div class="card">
     <div class="input-row">
       <span class="input-prefix">&gt;_</span>
-      <input id="item-input" type="text" placeholder="neuen bug eintragen…" maxlength="280" autocomplete="off" />
+      <input id="item-input" type="text" placeholder="neuen eintrag hinzufügen…" maxlength="280" autocomplete="off" />
       <button id="add-btn" title="Hinzufügen">+</button>
     </div>
     <ul id="list">
-      <li id="empty">// keine einträge — <span>ersten bug melden ↑</span></li>
+      <li id="empty">// keine einträge — <span>ersten eintrag hinzufügen ↑</span></li>
     </ul>
   </div>
  
@@ -337,7 +326,7 @@
     const list = $('list');
     list.innerHTML = '';
     if (!items.length) {
-      list.innerHTML = '<li id="empty">// keine einträge — <span>ersten bug melden ↑</span></li>';
+      list.innerHTML = '<li id="empty">// keine einträge — <span>ersten eintrag hinzufügen ↑</span></li>';
       return;
     }
     items.forEach((item, i) => list.appendChild(makeRow(item, i + 1)));
@@ -391,8 +380,7 @@
         const el = document.querySelector(`[data-id="${item.id}"]`);
         if (el) el.remove();
         if (!$('list').children.length)
-          $('list').innerHTML = '<li id="empty">// keine einträge — <span>ersten bug melden ↑</span></li>';
-        // re-number
+          $('list').innerHTML = '<li id="empty">// keine einträge — <span>ersten eintrag hinzufügen ↑</span></li>';
         document.querySelectorAll('.item-index').forEach((el, i) => el.textContent = '#' + String(i+1).padStart(2,'0'));
       })
       .subscribe();
@@ -407,3 +395,4 @@
 </script>
 </body>
 </html>
+ 
