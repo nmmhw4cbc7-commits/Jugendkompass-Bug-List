@@ -1,4 +1,5 @@
-Shared list
+
+Shared List
 
 <!DOCTYPE html>
 <html lang="en">
@@ -273,14 +274,95 @@ Shared list
       padding-left: 4px;
       letter-spacing: 0.3px;
     }
+ 
+    /* ── floating export button ── */
+    #export-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 100;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(96,165,250,0.3);
+      background: rgba(10,25,60,0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--accent);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(96,165,250,0.1);
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    #export-btn:hover {
+      transform: scale(1.1);
+      background: rgba(96,165,250,0.15);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(96,165,250,0.25);
+    }
+    #export-btn:active { transform: scale(0.96); }
+ 
+    /* ── github link ── */
+    #github-link {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s, transform 0.15s;
+      display: flex;
+      align-items: center;
+    }
+    #github-link:hover {
+      color: var(--accent);
+      transform: translateX(-50%) scale(1.15);
+    }
+    #github-link svg { width: 22px; height: 22px; }
+ 
+    /* ── print / pdf export ── */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 32px !important;
+        display: block !important;
+      }
+      body::before { display: none; }
+      header { max-width: 100%; margin-bottom: 16px; }
+      .live-badge, #export-btn { display: none !important; }
+      h1 { color: #000 !important; font-size: 20px; }
+      h1 .prefix { color: #555 !important; }
+      header p { color: #555 !important; margin-bottom: 16px; }
+      .card {
+        max-width: 100%;
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+      }
+      .input-row { display: none !important; }
+      .item { border-bottom: 1px solid #eee !important; padding: 10px 14px !important; }
+      .item:hover { background: none !important; }
+      .item-index { color: #999 !important; }
+      .item-text { color: #000 !important; font-size: 12px !important; }
+      .item-time { color: #999 !important; }
+      .delete-btn { display: none !important; }
+      #empty { color: #999 !important; }
+      #status { display: none; }
+    }
   </style>
 </head>
 <body>
  
   <header>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-      <div class="live-badge" style="margin-bottom:0"><span class="live-dot"></span> live sync</div>
-      <div class="live-badge" id="online-badge" style="margin-bottom:0">● <span id="online-count">–</span>&nbsp;online</div>
+    <!-- ÄNDERUNG 1: badges nebeneinander + online zähler -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <div class="live-badge"><span class="live-dot"></span> live sync</div>
+      <div class="live-badge"><span class="live-dot"></span> <span id="online-count">–</span> online</div>
     </div>
     <h1><span class="prefix">// </span>Jugendkompass To Do Liste</h1>
     <p>geteilte Liste für To Do's und Bugs in der Jugendkompass App</p>
@@ -370,6 +452,7 @@ Shared list
     if (error) { li.classList.remove('removing'); setStatus('[error] ' + error.message); }
   }
  
+  // ÄNDERUNG 2: presence hinzugefügt (.subscribe() → async + track)
   function subscribeRealtime() {
     const myId = crypto.randomUUID();
     channel = client
@@ -387,15 +470,18 @@ Shared list
         document.querySelectorAll('.item-index').forEach((el, i) => el.textContent = '#' + String(i+1).padStart(2,'0'));
       })
       .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const count = Object.keys(state).length;
+        const count = Object.keys(channel.presenceState()).length;
         $('online-count').textContent = count;
       })
       .subscribe(async status => {
         if (status === 'SUBSCRIBED') {
-          await channel.track({ user: myId, online_at: new Date().toISOString() });
+          await channel.track({ user: myId });
         }
       });
+  }
+ 
+  function exportPDF() {
+    window.print();
   }
  
   let _t;
@@ -405,6 +491,14 @@ Shared list
     if (msg && ms) _t = setTimeout(() => $('status').textContent = '', ms);
   }
 </script>
+  <a id="github-link" href="https://github.com/nmmhw4cbc7-commits" target="_blank" title="GitHub">
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+    </svg>
+  </a>
+ 
+  <button id="export-btn" onclick="exportPDF()" title="Als PDF exportieren">↓</button>
+ 
 </body>
 </html>
  
