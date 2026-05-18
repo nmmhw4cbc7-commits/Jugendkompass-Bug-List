@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -362,7 +361,7 @@
     <!-- ÄNDERUNG 1: badges nebeneinander + online zähler -->
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <div class="live-badge"><span class="live-dot"></span> live sync</div>
-      <div class="live-badge"><span class="live-dot"></span> <span id="online-count">–</span> online</div>
+      <div class="live-badge"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0;"></span> <span id="online-count">–</span> online</div>
     </div>
     <h1><span class="prefix">// </span>Jugendkompass To Do Liste</h1>
     <p>geteilte Liste für To Do's und Bugs in der Jugendkompass App</p>
@@ -497,7 +496,14 @@
     </svg>
   </a>
  
-  <button id="export-btn" onclick="exportPDF()" title="Als PDF exportieren">↓</button>
+  <button id="export-btn" onclick="exportPDF()" title="Als PDF exportieren">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>
+    </button>
  
 </body>
 </html>
